@@ -1,5 +1,7 @@
+from flask import Flask, jsonify
 import sqlite3
 
+app = Flask(__name__)
 NOME_BANCO = 'banco_pi.db'
 
 def inicializar_banco():
@@ -7,7 +9,6 @@ def inicializar_banco():
     conexao = sqlite3.connect(NOME_BANCO)
     cursor = conexao.cursor()
     
-    # Criar tabela
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS alunos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,11 +18,8 @@ def inicializar_banco():
         )
     ''')
     
-    # Verificar se a tabela está vazia
     cursor.execute('SELECT COUNT(*) FROM alunos')
-    total = cursor.fetchone()[0]
-    
-    if total == 0:
+    if cursor.fetchone()[0] == 0:
         alunos_iniciais = [
             ('Érick Garcia', '2026001', 'Análise e Desenvolvimento de Sistemas'),
             ('Maria Fátima', '2026002', 'Engenharia de Software')
@@ -31,9 +29,28 @@ def inicializar_banco():
             alunos_iniciais
         )
         conexao.commit()
-        print("-> Dados de teste inseridos com sucesso!")
         
     conexao.close()
 
+
+@app.route('/alunos', methods=['GET'])
+def listar_alunos():
+    """Endpoint REST para listar os alunos do banco em formato JSON."""
+    conexao = sqlite3.connect(NOME_BANCO)
+    conexao.row_factory = sqlite3.Row
+    cursor = conexao.cursor()
+    
+    cursor.execute('SELECT * FROM alunos')
+    linhas = cursor.fetchall()
+    conexao.close()
+    
+    # Converter resultado para lista de dicionarios
+    lista_alunos = [dict(linha) for linha in linhas]
+    
+    return jsonify(lista_alunos), 200
+
+
 if __name__ == '__main__':
     inicializar_banco()
+    print("-> Servidor REST ativo em: http://127.0.0.1:5000/alunos")
+    app.run(debug=True, port=5000)
