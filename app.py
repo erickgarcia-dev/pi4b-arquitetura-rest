@@ -3,23 +3,37 @@ import sqlite3
 NOME_BANCO = 'banco_pi.db'
 
 def inicializar_banco():
-    """Conecta ao arquivo SQLite e cria a tabela 'alunos' se não existir."""
+    """Conecta ao SQLite, cria a tabela e insere registros de teste iniciais."""
     conexao = sqlite3.connect(NOME_BANCO)
     cursor = conexao.cursor()
     
-    # Comando SQL para criar a tabela
-    comando_sql = '''
+    # Criar tabela
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS alunos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             matricula TEXT NOT NULL,
             curso TEXT NOT NULL
         )
-    '''
-    cursor.execute(comando_sql)
-    conexao.commit()
+    ''')
+    
+    # Verificar se a tabela está vazia
+    cursor.execute('SELECT COUNT(*) FROM alunos')
+    total = cursor.fetchone()[0]
+    
+    if total == 0:
+        alunos_iniciais = [
+            ('Érick Garcia', '2026001', 'Análise e Desenvolvimento de Sistemas'),
+            ('Maria Fátima', '2026002', 'Engenharia de Software')
+        ]
+        cursor.executemany(
+            'INSERT INTO alunos (nome, matricula, curso) VALUES (?, ?, ?)', 
+            alunos_iniciais
+        )
+        conexao.commit()
+        print("-> Dados de teste inseridos com sucesso!")
+        
     conexao.close()
-    print("-> Banco de dados e tabela 'alunos' verificados/criados com sucesso!")
 
 if __name__ == '__main__':
     inicializar_banco()
