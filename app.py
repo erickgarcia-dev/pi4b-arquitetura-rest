@@ -22,7 +22,7 @@ def inicializar_banco():
     if cursor.fetchone()[0] == 0:
         alunos_iniciais = [
             ('Érick Garcia', '2026001', 'Análise e Desenvolvimento de Sistemas'),
-            ('Maria Fátima', '2026002', 'Engenharia de Software')
+            ('João Ortiz', '2026002', 'Análise e Desenvolvimento de Sistemas')
         ]
         cursor.executemany(
             'INSERT INTO alunos (nome, matricula, curso) VALUES (?, ?, ?)', 
