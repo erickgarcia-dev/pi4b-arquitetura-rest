@@ -57,8 +57,8 @@ def listar_alunos():
     
     return jsonify(lista_alunos), 200
 
+inicializar_banco()
 
 if __name__ == '__main__':
-    inicializar_banco()
     print("-> Servidor REST ativo em: http://127.0.0.1:5000/alunos")
     app.run(debug=True, port=5000)
