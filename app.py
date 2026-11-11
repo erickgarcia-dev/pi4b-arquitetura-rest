@@ -44,18 +44,18 @@ def inicializar_banco():
             conexao.commit()
 
 
-@app.route('/alunos', methods=['GET'])
-def listar_alunos():
-    """Endpoint REST para listar os alunos do banco em formato JSON."""
+@app.route('/alunos/<int:aluno_id>', methods=['GET'])
+def buscar_aluno(aluno_id):
+    """GET /alunos/<id>: retorna um aluno (200 OK) ou erro 404 se não existir."""
     with closing(obter_conexao()) as conexao:
-        cursor = conexao.cursor()
-        cursor.execute(f'SELECT {COLUNAS} FROM alunos')
-        linhas = cursor.fetchall()
-    
-    # Converter resultado para lista de dicionarios
-    lista_alunos = [dict(linha) for linha in linhas]
-    
-    return jsonify(lista_alunos), 200
+        linha = conexao.execute(
+            f'SELECT {COLUNAS} FROM alunos WHERE id = ?', (aluno_id,)
+        ).fetchone()
+
+    if linha is None:
+        return jsonify({'erro': 'aluno_nao_encontrado'}), 404
+
+    return jsonify(dict(linha)), 200
 
 inicializar_banco()
 
