@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from contextlib import closing
 
@@ -7,7 +8,7 @@ app = Flask(__name__)
 app.json.sort_keys = False
 app.json.ensure_ascii = False
 
-NOME_BANCO = 'banco_pi.db'
+NOME_BANCO = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'banco_pi.db')
 COLUNAS = 'id, nome, matricula, curso'
 
 def obter_conexao():
