@@ -25,7 +25,7 @@ def inicializar_banco():
             CREATE TABLE IF NOT EXISTS alunos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nome TEXT NOT NULL,
-                matricula TEXT NOT NULL,
+                matricula TEXT NOT NULL UNIQUE,
                 curso TEXT NOT NULL
             )
         ''')
