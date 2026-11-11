@@ -57,6 +57,18 @@ def buscar_aluno(aluno_id):
 
     return jsonify(dict(linha)), 200
 
+@app.errorhandler(404)
+def rota_nao_encontrada(_erro):
+    return jsonify({'erro': 'recurso_nao_encontrado'}), 404
+
+@app.errorhandler(405)
+def metodo_nao_permitido(_erro):
+    return jsonify({'erro': 'metodo_nao_permitido'}), 405
+
+@app.errorhandler(500)
+def erro_interno(_erro):
+    return jsonify({'erro': 'erro_interno'}), 500
+
 inicializar_banco()
 
 if __name__ == '__main__':
