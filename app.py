@@ -5,6 +5,7 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 NOME_BANCO = 'banco_pi.db'
+COLUNAS = 'id, nome, matricula, curso'
 
 def obter_conexao():
     """Abre uma conexão curta com o SQLite; as linhas podem ser lidas como dicionários."""
@@ -44,7 +45,7 @@ def listar_alunos():
     """Endpoint REST para listar os alunos do banco em formato JSON."""
     with closing(obter_conexao()) as conexao:
         cursor = conexao.cursor()
-        cursor.execute('SELECT * FROM alunos')
+        cursor.execute(f'SELECT {COLUNAS} FROM alunos')
         linhas = cursor.fetchall()
     
     # Converter resultado para lista de dicionarios
