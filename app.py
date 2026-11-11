@@ -4,9 +4,15 @@ import sqlite3
 app = Flask(__name__)
 NOME_BANCO = 'banco_pi.db'
 
+def obter_conexao():
+    """Abre uma conexão curta com o SQLite; as linhas podem ser lidas como dicionários."""
+    conexao = sqlite3.connect(NOME_BANCO)
+    conexao.row_factory = sqlite3.Row
+    return conexao
+
 def inicializar_banco():
     """Conecta ao SQLite, cria a tabela e insere registros de teste iniciais."""
-    conexao = sqlite3.connect(NOME_BANCO)
+    conexao = obter_conexao()
     cursor = conexao.cursor()
     
     cursor.execute('''
