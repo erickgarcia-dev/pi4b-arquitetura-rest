@@ -4,6 +4,9 @@ from contextlib import closing
 from flask import Flask, jsonify
 
 app = Flask(__name__)
+app.json.sort_keys = False
+app.json.ensure_ascii = False
+
 NOME_BANCO = 'banco_pi.db'
 COLUNAS = 'id, nome, matricula, curso'
 
