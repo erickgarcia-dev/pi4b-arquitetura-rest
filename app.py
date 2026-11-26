@@ -74,6 +74,42 @@ def buscar_aluno(aluno_id):
 
     return jsonify(dict(linha)), 200
 
+@app.route('/alunos', methods=['POST'])
+def criar_aluno():
+    """POST /alunos: cadastra um novo aluno e retorna 201 Created."""
+    dados = request.get_json(silent=True)
+
+    campos_obrigatorios = ('nome', 'matricula', 'curso')
+    if not dados or not all(
+        campo in dados and str(dados[campo]).strip() for campo in campos_obrigatorios
+    ):
+        return jsonify({'erro': 'campos_obrigatorios_ausentes'}), 400
+
+    nome = str(dados['nome']).strip()
+    matricula = str(dados['matricula']).strip()
+    curso = str(dados['curso']).strip()
+
+    try:
+        with closing(obter_conexao()) as conexao:
+            cursor = conexao.cursor()
+            cursor.execute(
+                'INSERT INTO alunos (nome, matricula, curso) VALUES (?, ?, ?)',
+                (nome, matricula, curso)
+            )
+            conexao.commit()
+            novo_id = cursor.lastrowid
+
+        novo_aluno = {
+            'id': novo_id,
+            'nome': nome,
+            'matricula': matricula,
+            'curso': curso
+        }
+        return jsonify(novo_aluno), 201
+
+    except sqlite3.IntegrityError:
+        return jsonify({'erro': 'matricula_ja_cadastrada'}), 400
+
 
 @app.errorhandler(404)
 def rota_nao_encontrada(_erro):
