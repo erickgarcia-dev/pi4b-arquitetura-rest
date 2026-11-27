@@ -109,6 +109,46 @@ def criar_aluno():
 
     except sqlite3.IntegrityError:
         return jsonify({'erro': 'matricula_ja_cadastrada'}), 400
+    
+
+@app.route('/alunos/<int:aluno_id>', methods=['PUT'])
+def atualizar_aluno(aluno_id):
+    """PUT /alunos/<id>: atualiza os dados de um aluno existente (200 OK)."""
+    dados = request.get_json(silent=True)
+
+    campos_obrigatorios = ('nome', 'matricula', 'curso')
+    if not dados or not all(
+        campo in dados and str(dados[campo]).strip() for campo in campos_obrigatorios
+    ):
+        return jsonify({'erro': 'campos_obrigatorios_ausentes'}), 400
+
+    nome = str(dados['nome']).strip()
+    matricula = str(dados['matricula']).strip()
+    curso = str(dados['curso']).strip()
+
+    try:
+        with closing(obter_conexao()) as conexao:
+            cursor = conexao.cursor()
+            cursor.execute('SELECT id FROM alunos WHERE id = ?', (aluno_id,))
+            if cursor.fetchone() is None:
+                return jsonify({'erro': 'aluno_nao_encontrado'}), 404
+
+            cursor.execute(
+                'UPDATE alunos SET nome = ?, matricula = ?, curso = ? WHERE id = ?',
+                (nome, matricula, curso, aluno_id)
+            )
+            conexao.commit()
+
+        aluno_atualizado = {
+            'id': aluno_id,
+            'nome': nome,
+            'matricula': matricula,
+            'curso': curso
+        }
+        return jsonify(aluno_atualizado), 200
+
+    except sqlite3.IntegrityError:
+        return jsonify({'erro': 'matricula_ja_cadastrada'}), 400
 
 
 @app.errorhandler(404)
